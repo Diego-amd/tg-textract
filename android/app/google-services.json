@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "328299788469",
+    "project_id": "tg-diego-heiter",
+    "storage_bucket": "tg-diego-heiter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328299788469:android:24828598a96a5ae9de66fc",
+        "android_client_info": {
+          "package_name": "com.example.tg_textract"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "328299788469-m6hr59sv8j8gqd83g0lbd9011cch5al3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoq7V8QVw3q3tlI0Y4DHbEkGv1Q8Fkro0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "328299788469-m6hr59sv8j8gqd83g0lbd9011cch5al3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

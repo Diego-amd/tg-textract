@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.tg_textract">
    <application
-        android:label="tg_textract"
+        android:label="TG Textract"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
