@@ -2,9 +2,11 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:camera_camera/camera_camera.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 import '../widgets/anexo.dart';
 import 'preview_page.dart';
@@ -19,12 +21,28 @@ class FotoView extends StatefulWidget {
 class _FotoViewState extends State<FotoView> {
   File? arquivo;
   final picker = ImagePicker();
+  final FirebaseStorage storage = FirebaseStorage.instance;
+
+  Future<void> upload(String path) async {
+    File file = File(path);
+    try {
+      var data = DateTime.now();
+      var formato = DateFormat('yyyy-MM-dd H:m:s');
+      String dataFormatada = formato.format(data);
+
+      String ref = 'images/img-$dataFormatada.jpg';
+      await storage.ref(ref).putFile(file);
+    } on FirebaseException catch (e) {
+      throw Exception('Erro no upload: ${e.code}');
+    }
+  }
 
   Future getFileFromGallery() async {
     // ignore: deprecated_member_use
     PickedFile? file = await picker.getImage(source: ImageSource.gallery);
 
     if (file != null) {
+      await upload(file.path);
       setState(() => arquivo = File(file.path));
     }
   }

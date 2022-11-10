@@ -14,7 +14,9 @@ class _App extends State<App> {
     return GetMaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
+          primarySwatch: Colors.green,
           primaryColor: Colors.grey,
+          brightness: Brightness.dark,
         ),
         routes: {
           '/': (context) => FotoView(),

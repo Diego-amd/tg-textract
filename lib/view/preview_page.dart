@@ -1,12 +1,39 @@
 import 'dart:io';
 
+import 'package:camera_camera/camera_camera.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class PreviewPage extends StatelessWidget {
   File file;
 
   PreviewPage({Key? key, required this.file}) : super(key: key);
+
+  final FirebaseStorage storage = FirebaseStorage.instance;
+
+  Future<void> upload(String path) async {
+    file = File(path);
+    try {
+      var data = DateTime.now();
+      var formato = DateFormat('yyyy-MM-dd H:m:s');
+      String dataFormatada = formato.format(data);
+
+      String ref = 'images/img-$dataFormatada.jpg';
+      await storage.ref(ref).putFile(file);
+    } on FirebaseException catch (e) {
+      throw Exception('Erro no upload: ${e.code}');
+    }
+  }
+
+  pickAndUploadImage() async {
+    File? file = this.file;
+    if (file != null) {
+      await upload(file.path);
+      Get.back(result: file);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +62,7 @@ class PreviewPage extends StatelessWidget {
                               color: Colors.white,
                               size: 30,
                             ),
-                            onPressed: () => Get.back(result: file),
+                            onPressed: pickAndUploadImage,
                           ),
                         ),
                       ),
