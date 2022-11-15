@@ -6,8 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import 'package:tg_textract/services/azure_service.dart';
+
 class PreviewPage extends StatelessWidget {
   File file;
+  String? url_image;
+  AzureService? azure;
 
   PreviewPage({Key? key, required this.file}) : super(key: key);
 
@@ -22,6 +26,12 @@ class PreviewPage extends StatelessWidget {
 
       String ref = 'images/img-$dataFormatada.jpg';
       await storage.ref(ref).putFile(file);
+
+      url_image = await storage.ref(ref).getDownloadURL();
+
+      var result_id = await azure?.analyseDocumento(url_image);
+
+      print(result_id);
     } on FirebaseException catch (e) {
       throw Exception('Erro no upload: ${e.code}');
     }

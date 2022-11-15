@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
@@ -7,9 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 
 import '../widgets/anexo.dart';
 import 'preview_page.dart';
+
+import 'package:tg_textract/services/azure_service.dart';
 
 class FotoView extends StatefulWidget {
   FotoView({Key? key}) : super(key: key);
@@ -22,6 +27,13 @@ class _FotoViewState extends State<FotoView> {
   File? arquivo;
   final picker = ImagePicker();
   final FirebaseStorage storage = FirebaseStorage.instance;
+  String url_image = "";
+  final String endpoint = "brazilsouth.api.cognitive.microsoft.com";
+  final String model_id = "prebuilt-invoice";
+  final String subscription_key = "d4360258e59a412583a4103d2e00aabf";
+  final String api_version = "2022-08-31";
+  final String index_type = "textElements";
+  var result_id;
 
   Future<void> upload(String path) async {
     File file = File(path);
@@ -32,6 +44,14 @@ class _FotoViewState extends State<FotoView> {
 
       String ref = 'images/img-$dataFormatada.jpg';
       await storage.ref(ref).putFile(file);
+
+      url_image = await storage.ref(ref).getDownloadURL();
+
+      var result_id = await analyzeDocumento(url_image);
+
+      var resultAnalyze = await getAnalyzeResult(result_id);
+
+      print(resultAnalyze);
     } on FirebaseException catch (e) {
       throw Exception('Erro no upload: ${e.code}');
     }
@@ -54,6 +74,56 @@ class _FotoViewState extends State<FotoView> {
       setState(() => arquivo = arq);
       Get.back();
     }
+  }
+
+  analyzeDocumento(String url_source) async {
+    var url = Uri.https(
+        endpoint,
+        '/formrecognizer/documentModels/$model_id:analyze',
+        {'api-version': api_version, 'stringIndexType': index_type});
+
+    Map<String, String> requestHeaders = {
+      'Content-type': 'application/json',
+      'Accept': '*/*',
+      'Ocp-Apim-Subscription-Key': subscription_key
+    };
+
+    var body = jsonEncode({"urlSource": url_source});
+
+    var response = await http.post(url, headers: requestHeaders, body: body);
+    if (response.statusCode == 202) {
+      result_id = response.headers;
+    } else {
+      print('Requisição falhou com o status: ${response.statusCode}.');
+    }
+
+    return result_id['apim-request-id'];
+  }
+
+  getAnalyzeResult(String apimRequestId) async {
+    var url = Uri.https(
+        endpoint,
+        '/formrecognizer/documentModels/$model_id/analyzeResults/$apimRequestId',
+        {'api-version': api_version});
+
+    Map<String, String> requestHeaders = {
+      'Accept': '*/*',
+      'Ocp-Apim-Subscription-Key': subscription_key
+    };
+
+    var data;
+
+    var response = await http.get(url, headers: requestHeaders);
+    if (response.statusCode == 200) {
+      var jsonResponse =
+          convert.jsonDecode(response.body) as Map<String, dynamic>;
+      data = convert.jsonDecode(response.body) as Map<String, dynamic>;
+      print(jsonResponse['analyzeResult']);
+    } else {
+      print('Requisição falhou com o status: ${response.statusCode}.');
+    }
+
+    return data;
   }
 
   @override
