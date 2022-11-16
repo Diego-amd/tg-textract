@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'foto.view.dart';
+import 'dados.digitalizados.view.dart';
 
 class App extends StatefulWidget {
   @override

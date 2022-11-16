@@ -54,7 +54,7 @@ class PreviewPage extends StatelessWidget {
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: Image.file(file, fit: BoxFit.cover),
+                  child: Image.file(file, fit: BoxFit.fitWidth),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
