@@ -10,6 +10,7 @@ import 'dart:convert' as convert;
 import 'package:tg_textract/model/dados.dart';
 import 'package:tg_textract/widgets/anexo.dart';
 import 'variaveis.dart' as vars;
+import 'package:clipboard/clipboard.dart';
 
 class DadosDigitalizadosView extends StatefulWidget {
   DadosDigitalizadosView({super.key});
@@ -38,6 +39,10 @@ class _DadosDigitalizadosView extends State<DadosDigitalizadosView> {
   final String api_version = "2022-08-31";
   final String index_type = "textElements";
   var jsonResponse;
+  var keys;
+  var values;
+  var teste;
+  var testeDois;
 
   var apimRequestId = vars.result_id;
   var file = vars.file;
@@ -58,10 +63,6 @@ class _DadosDigitalizadosView extends State<DadosDigitalizadosView> {
     if (response.statusCode == 200) {
       jsonResponse = await convert.jsonDecode(response.body);
 
-      // dados = jsonResponse.map<Dados>((dados) {
-      //   return Dados.fromJson(dados);
-      // }).toList();
-
       if (jsonResponse['status'] == 'running') {
         setState(() {
           chamaAnalyze();
@@ -70,9 +71,10 @@ class _DadosDigitalizadosView extends State<DadosDigitalizadosView> {
       } else {
         if (jsonResponse['status'] == 'succeeded') {
           dados = jsonResponse['analyzeResult'];
-          List<dynamic> keyValue = dados?['keyValuePairs'];
-          var keys = keyValue.map((value) => value['key']['content']);
-          var values = keyValue.map((value) => value['value']?['content']);
+          var keyValue = dados?['keyValuePairs'];
+          keys = keyValue.map((value) => value['key']['content']).toList();
+          values = keyValue.map((value) => value['value']?['content']).toList();
+          teste = keys.length;
 
           print(keys);
           print(values);
@@ -120,122 +122,48 @@ class _DadosDigitalizadosView extends State<DadosDigitalizadosView> {
                         Anexo(arquivo: file!),
                         Column(
                           children: [
-                            Container(
-                              width: 350,
-                              height: 50,
-                              margin: EdgeInsets.only(top: 31),
-                              padding: EdgeInsets.only(left: 16),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                                border: Border.all(
-                                  width: 2.0,
-                                  color: Colors.green,
-                                ),
-                              ),
-                              child: TextFormField(
-                                initialValue: '123456',
-                                readOnly: true,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "CPF",
-                                  labelStyle: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 16),
-                                ),
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                            ),
-                            Container(
-                              width: 350,
-                              height: 50,
-                              margin: EdgeInsets.only(top: 20),
-                              padding: EdgeInsets.only(left: 16),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                                border: Border.all(
-                                  width: 2.0,
-                                  color: Colors.green,
-                                ),
-                              ),
-                              child: TextFormField(
-                                initialValue: '123456',
-                                readOnly: true,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "CPF",
-                                  labelStyle: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 16),
-                                ),
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ),
-                            Container(
-                              width: 350,
-                              height: 50,
-                              margin: EdgeInsets.only(top: 20),
-                              padding: EdgeInsets.only(left: 16),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                                border: Border.all(
-                                  width: 2.0,
-                                  color: Colors.green,
-                                ),
-                              ),
-                              child: TextFormField(
-                                initialValue: '123456',
-                                readOnly: true,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "CPF",
-                                  labelStyle: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 16),
-                                ),
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ),
-                            Container(
-                              width: 350,
-                              height: 50,
-                              margin: EdgeInsets.only(top: 20),
-                              padding: EdgeInsets.only(left: 16),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                                border: Border.all(
-                                  width: 2.0,
-                                  color: Colors.green,
-                                ),
-                              ),
-                              child: TextFormField(
-                                initialValue: '123456',
-                                readOnly: true,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "CPF",
-                                  labelStyle: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 16),
-                                ),
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ),
+                            ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                itemCount: teste,
+                                itemBuilder: (_, index) {
+                                  return Row(children: [
+                                    Container(
+                                      width: 320,
+                                      height: 50,
+                                      margin: EdgeInsets.only(top: 20),
+                                      padding: EdgeInsets.only(left: 10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.transparent,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(10),
+                                        ),
+                                        border: Border.all(
+                                          width: 2.0,
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                      child: TextFormField(
+                                          initialValue: values[index],
+                                          readOnly: true,
+                                          decoration: const InputDecoration(
+                                            border: InputBorder.none,
+                                            hintText: "CPF",
+                                            labelStyle: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 16),
+                                          ),
+                                          style: const TextStyle(fontSize: 16)),
+                                    ),
+                                    IconButton(
+                                        icon: Icon(Icons.content_copy),
+                                        onPressed: () async {
+                                          await FlutterClipboard.copy(
+                                              values[index]);
+                                        }),
+                                  ]);
+                                }),
                           ],
                         ),
                       ],
