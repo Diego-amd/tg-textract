@@ -30,13 +30,16 @@ class _FotoViewState extends State<FotoView> {
   final picker = ImagePicker();
   final FirebaseStorage storage = FirebaseStorage.instance;
   String url_image = "";
-  final String endpoint = "brazilsouth.api.cognitive.microsoft.com";
-  final String model_id = "prebuilt-invoice";
-  final String subscription_key = "d4360258e59a412583a4103d2e00aabf";
-  final String api_version = "2022-08-31";
-  final String index_type = "textElements";
   var result_id;
   var loading = false;
+
+  @override
+  initState() {
+    super.initState();
+    setState(() {
+      loading = false;
+    });
+  }
 
   Future<void> upload(String path) async {
     File file = File(path);
@@ -55,10 +58,6 @@ class _FotoViewState extends State<FotoView> {
       vars.file = file;
 
       await Get.to(() => DadosDigitalizadosView());
-
-      // var resultAnalyze = await getAnalyzeResult(result_id);
-
-      // print(resultAnalyze);
     } on FirebaseException catch (e) {
       setState(() => loading = false);
       throw Exception('Erro no upload: ${e.code}');
@@ -85,15 +84,16 @@ class _FotoViewState extends State<FotoView> {
   }
 
   analyzeDocumento(String url_source) async {
+    var modelId = vars.model_id;
     var url = Uri.https(
-        endpoint,
-        '/formrecognizer/documentModels/$model_id:analyze',
-        {'api-version': api_version, 'stringIndexType': index_type});
+        vars.endpoint,
+        '/formrecognizer/documentModels/$modelId:analyze',
+        {'api-version': vars.api_version, 'stringIndexType': vars.index_type});
 
     Map<String, String> requestHeaders = {
       'Content-type': 'application/json',
       'Accept': '*/*',
-      'Ocp-Apim-Subscription-Key': subscription_key
+      'Ocp-Apim-Subscription-Key': vars.subscription_key
     };
 
     var body = jsonEncode({"urlSource": url_source});
@@ -106,32 +106,6 @@ class _FotoViewState extends State<FotoView> {
     }
 
     return result_id['apim-request-id'];
-  }
-
-  getAnalyzeResult(String apimRequestId) async {
-    var url = Uri.https(
-        endpoint,
-        '/formrecognizer/documentModels/$model_id/analyzeResults/$apimRequestId',
-        {'api-version': api_version});
-
-    Map<String, String> requestHeaders = {
-      'Accept': '*/*',
-      'Ocp-Apim-Subscription-Key': subscription_key
-    };
-
-    var data;
-
-    var response = await http.get(url, headers: requestHeaders);
-    if (response.statusCode == 200) {
-      var jsonResponse =
-          convert.jsonDecode(response.body) as Map<String, dynamic>;
-      data = convert.jsonDecode(response.body) as Map<String, dynamic>;
-      print(jsonResponse['analyzeResult']);
-    } else {
-      print('Requisição falhou com o status: ${response.statusCode}.');
-    }
-
-    return data;
   }
 
   @override
