@@ -72,18 +72,25 @@ class _DadosDigitalizadosView extends State<DadosDigitalizadosView> {
           keys = keyValue.map((value) => value['key']['content']).toList();
           values = keyValue.map((value) => value['value']?['content']).toList();
           keys.remove('ASSINATURA DO DIRETOR');
-          if (keys.contains('via ')) {
-            keys.remove('via ');
+          if (keys.contains('via') || values.contains('via')) {
+            keys.remove('via');
+            values.remove('via');
           }
           if (keys.contains('REGISTRO')) {
             keys[0] = 'REGISTRO GERAL';
+          }
+          if (keys.contains('MOME')) {
+            keys[2] = 'NOME';
+          }
+          if (keys.contains('GERAL')) {
+            keys.remove('GERAL');
           }
           if (keys.contains('DATA DE')) {
             keys.remove('EXPEDIÇÃO');
             values.remove(null);
             keys[1] = 'DATA DE EXPEDIÇÃO';
           }
-          if (keys.contains('IONE DE')) {
+          if (keys.contains('IONE DE') || keys.contains('IONE')) {
             keys.remove('IONE DE');
             values.remove('ALMEIDA ARMINDO');
             values[3] = values[3] + '\n' + ' IONE DE ALMEIDA ARMINDO';
@@ -132,7 +139,7 @@ class _DadosDigitalizadosView extends State<DadosDigitalizadosView> {
                 border: Border.all(color: Colors.green),
               ),
               child: RawMaterialButton(
-                onPressed: () => Get.offAll(() => FotoView()),
+                onPressed: () => renderModalSair(context),
                 child: Text("+",
                     style: TextStyle(fontSize: 40, color: Colors.green)),
               ))
@@ -201,6 +208,84 @@ class _DadosDigitalizadosView extends State<DadosDigitalizadosView> {
           ),
         ),
       ),
+    );
+  }
+
+  void renderModalSair(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          color: const Color.fromRGBO(6, 32, 41, 2),
+          height: MediaQuery.of(context).size.height * 0.3,
+          child: Container(
+            padding: EdgeInsets.only(top: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
+              ),
+              border: Border.all(color: Colors.green),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text(
+                  "Deseja digitalizar um novo documento? Os dados atuais serão perdidos",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 150,
+                      height: 70,
+                      margin: const EdgeInsets.only(
+                          left: 0, top: 30, right: 25, bottom: 25),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Color.fromRGBO(6, 32, 41, 2)),
+                        borderRadius: BorderRadius.all(Radius.circular(25)),
+                      ),
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          "Não",
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Color.fromRGBO(6, 32, 41, 2)),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 150,
+                      height: 70,
+                      margin: const EdgeInsets.only(
+                          left: 25, top: 30, right: 25, bottom: 25),
+                      decoration: const BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.all(Radius.circular(25)),
+                      ),
+                      child: TextButton(
+                        onPressed: () => Get.offAll(() => FotoView()),
+                        child: const Text("Sim",
+                            style:
+                                TextStyle(fontSize: 18, color: Colors.white)),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

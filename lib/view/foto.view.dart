@@ -75,7 +75,8 @@ class _FotoViewState extends State<FotoView> {
   }
 
   showPreview(file) async {
-    File? arq = await Get.to(() => PreviewPage(file: file));
+    vars.file = file;
+    File? arq = await Get.to(() => PreviewPage());
 
     if (arq != null) {
       setState(() => arquivo = arq);

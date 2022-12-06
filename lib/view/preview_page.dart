@@ -13,24 +13,31 @@ import 'dart:convert' as convert;
 
 import 'package:tg_textract/services/azure_service.dart';
 
-class PreviewPage extends StatelessWidget {
-  File file;
+class PreviewPage extends StatefulWidget {
+  PreviewPage({super.key});
+
+  @override
+  _PreviewPage createState() => _PreviewPage();
+}
+
+class _PreviewPage extends State<PreviewPage> {
+  var file = vars.file;
   String? url_image;
   var result_id;
-
-  PreviewPage({Key? key, required this.file}) : super(key: key);
+  var loading = false;
 
   final FirebaseStorage storage = FirebaseStorage.instance;
 
   Future<void> upload(String path) async {
     file = File(path);
     try {
+      setState(() => loading = true);
       var data = DateTime.now();
       var formato = DateFormat('yyyy-MM-dd H:m:s');
       String dataFormatada = formato.format(data);
 
       String ref = 'images/img-$dataFormatada.jpg';
-      await storage.ref(ref).putFile(file);
+      await storage.ref(ref).putFile(file!);
 
       url_image = await storage.ref(ref).getDownloadURL();
 
@@ -40,6 +47,7 @@ class PreviewPage extends StatelessWidget {
 
       await Get.offAll(() => DadosDigitalizadosView());
     } on FirebaseException catch (e) {
+      setState(() => loading = false);
       throw Exception('Erro no upload: ${e.code}');
     }
   }
@@ -83,53 +91,62 @@ class PreviewPage extends StatelessWidget {
       body: Row(
         children: [
           Expanded(
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: Image.file(file, fit: BoxFit.fitWidth),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Padding(
-                        padding: EdgeInsets.all(32),
-                        child: CircleAvatar(
-                          radius: 32,
-                          backgroundColor: Colors.black.withOpacity(0.5),
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: 30,
-                            ),
-                            onPressed: pickAndUploadImage,
-                          ),
+            child: Center(
+              child: loading
+                  ? const CircularProgressIndicator(
+                      backgroundColor: Colors.green,
+                      color: Colors.white,
+                    )
+                  : Stack(
+                      children: [
+                        Positioned.fill(
+                          child: Image.file(file!, fit: BoxFit.fitWidth),
                         ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Padding(
-                        padding: EdgeInsets.all(32),
-                        child: CircleAvatar(
-                          radius: 32,
-                          backgroundColor: Colors.black.withOpacity(0.5),
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.close,
-                              color: Colors.white,
-                              size: 30,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Padding(
+                                padding: EdgeInsets.all(32),
+                                child: CircleAvatar(
+                                  radius: 32,
+                                  backgroundColor:
+                                      Colors.black.withOpacity(0.5),
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                      size: 30,
+                                    ),
+                                    onPressed: pickAndUploadImage,
+                                  ),
+                                ),
+                              ),
                             ),
-                            onPressed: () => Get.back(),
-                          ),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Padding(
+                                padding: EdgeInsets.all(32),
+                                child: CircleAvatar(
+                                  radius: 32,
+                                  backgroundColor:
+                                      Colors.black.withOpacity(0.5),
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.close,
+                                      color: Colors.white,
+                                      size: 30,
+                                    ),
+                                    onPressed: () => Get.back(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-              ],
             ),
           ),
         ],
