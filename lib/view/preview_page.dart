@@ -36,10 +36,9 @@ class PreviewPage extends StatelessWidget {
 
       vars.result_id = await analyzeDocumento(url_image);
 
-      print(vars.result_id);
       vars.file = file;
 
-      await Get.to(() => DadosDigitalizadosView());
+      await Get.offAll(() => DadosDigitalizadosView());
     } on FirebaseException catch (e) {
       throw Exception('Erro no upload: ${e.code}');
     }

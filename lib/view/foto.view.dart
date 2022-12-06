@@ -57,7 +57,7 @@ class _FotoViewState extends State<FotoView> {
       vars.result_id = await analyzeDocumento(url_image);
       vars.file = file;
 
-      await Get.to(() => DadosDigitalizadosView());
+      await Get.offAll(() => DadosDigitalizadosView());
     } on FirebaseException catch (e) {
       setState(() => loading = false);
       throw Exception('Erro no upload: ${e.code}');

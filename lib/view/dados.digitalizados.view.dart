@@ -75,6 +75,19 @@ class _DadosDigitalizadosView extends State<DadosDigitalizadosView> {
           if (keys.contains('via ')) {
             keys.remove('via ');
           }
+          if (keys.contains('REGISTRO')) {
+            keys[0] = 'REGISTRO GERAL';
+          }
+          if (keys.contains('DATA DE')) {
+            keys.remove('EXPEDIÇÃO');
+            values.remove(null);
+            keys[1] = 'DATA DE EXPEDIÇÃO';
+          }
+          if (keys.contains('IONE DE')) {
+            keys.remove('IONE DE');
+            values.remove('ALMEIDA ARMINDO');
+            values[3] = values[3] + '\n' + ' IONE DE ALMEIDA ARMINDO';
+          }
           if (values.contains('0')) {
             values.remove('0');
           }
@@ -84,7 +97,7 @@ class _DadosDigitalizadosView extends State<DadosDigitalizadosView> {
             loading = false;
           });
         } else {
-          print("Sou burros");
+          print("Erro");
         }
       }
 
@@ -106,6 +119,24 @@ class _DadosDigitalizadosView extends State<DadosDigitalizadosView> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dados do documento'),
+        actions: [
+          Container(
+              margin: EdgeInsets.only(right: 20),
+              width: 50,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(50),
+                ),
+                border: Border.all(color: Colors.green),
+              ),
+              child: RawMaterialButton(
+                onPressed: () => Get.offAll(() => FotoView()),
+                child: Text("+",
+                    style: TextStyle(fontSize: 40, color: Colors.green)),
+              ))
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -116,82 +147,52 @@ class _DadosDigitalizadosView extends State<DadosDigitalizadosView> {
                     color: Colors.white,
                   )
                 : Container(
-                    margin: EdgeInsets.symmetric(horizontal: 20),
+                    margin: EdgeInsets.symmetric(horizontal: 10),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Anexo(arquivo: file!),
                         Column(
                           children: [
-                            ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                itemCount: count,
-                                itemBuilder: (_, index) {
-                                  return ListTile(
-                                    leading: IconButton(
-                                        icon: const Icon(
-                                          Icons.content_copy,
-                                          color: Colors.green,
-                                        ),
-                                        onPressed: () async {
-                                          await FlutterClipboard.copy(
-                                              values[index]);
+                            SingleChildScrollView(
+                              child: ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemCount: count,
+                                  itemBuilder: (_, index) {
+                                    if (values[index] != null ||
+                                        values[index] != "") {
+                                      return ListTile(
+                                        leading: IconButton(
+                                            icon: const Icon(
+                                              Icons.content_copy,
+                                              color: Colors.green,
+                                            ),
+                                            onPressed: () async {
+                                              await FlutterClipboard.copy(
+                                                  values[index] != null
+                                                      ? values[index]
+                                                      : "");
 
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(const SnackBar(
-                                                  content: Text(
-                                                      "Campo copiado com sucesso!")));
-                                        }),
-                                    title: Text(keys[index]),
-                                    subtitle: values[index] != null
-                                        ? Text(
-                                            values[index],
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14),
-                                          )
-                                        : Text(""),
-                                  );
-
-                                  // return Row(children: [
-                                  //   Container(
-                                  //     width: 320,
-                                  //     height: 50,
-                                  //     margin: EdgeInsets.only(top: 20),
-                                  //     padding: EdgeInsets.only(left: 10),
-                                  //     decoration: BoxDecoration(
-                                  //       color: Colors.transparent,
-                                  //       borderRadius: BorderRadius.all(
-                                  //         Radius.circular(10),
-                                  //       ),
-                                  //       border: Border.all(
-                                  //         width: 2.0,
-                                  //         color: Colors.green,
-                                  //       ),
-                                  //     ),
-                                  //     child: TextFormField(
-                                  //         initialValue: values[index],
-                                  //         readOnly: true,
-                                  //         decoration: const InputDecoration(
-                                  //           border: InputBorder.none,
-                                  //           hintText: "CPF",
-                                  //           labelStyle: TextStyle(
-                                  //               color: Colors.black,
-                                  //               fontWeight: FontWeight.w400,
-                                  //               fontSize: 16),
-                                  //         ),
-                                  //         style: const TextStyle(fontSize: 16)),
-                                  //   ),
-                                  //   IconButton(
-                                  //       icon: Icon(Icons.content_copy),
-                                  //       onPressed: () async {
-                                  //         await FlutterClipboard.copy(
-                                  //             values[index]);
-                                  //       }),
-                                  // ]);
-                                }),
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(const SnackBar(
+                                                      content: Text(
+                                                          "Campo copiado com sucesso!")));
+                                            }),
+                                        title: Text(keys[index]),
+                                        subtitle: values[index] != null
+                                            ? Text(
+                                                values[index],
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 14),
+                                              )
+                                            : Text(""),
+                                      );
+                                    }
+                                    return Text("Teste");
+                                  }),
+                            )
                           ],
                         ),
                       ],
